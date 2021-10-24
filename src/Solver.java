@@ -50,7 +50,7 @@ public class Solver {
         ArrayList<Point> tratado = new ArrayList<>();
         pendents.add(crt);
         while ((pendents.size() > 0)){
-            Collections.sort(pendents, Collections.reverseOrder());
+            Collections.sort(pendents);
             crt = pendents.get(0);
             tratado.add(crt.getCoord());
             nExplored++;
@@ -73,9 +73,7 @@ public class Solver {
                 }
             });
         }
-
-
-        return crt; // cambiar
+        return null; // Si no hay solucion
     }
 
     public ArrayList<Node> lookArround(Node crt){
@@ -108,5 +106,12 @@ public class Solver {
             around.add(up);
         }
         return around;
+    }
+
+    public int heruristicCoord(Node node) {
+        int x = node.getCoord().x - end.x;
+        int y = node.getCoord().y - end.y;
+        int heuristic = x+y;
+        return heuristic;
     }
 }
