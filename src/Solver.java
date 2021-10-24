@@ -1,13 +1,15 @@
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
 import java.io.File;
 
 public class Solver {
     private char[][] map;
     private int nExplored;
-    private Point ini, end;
+    private Point ini;
+    private Point end;
     private int maxX, maxY;
 
     // Upload Map
@@ -39,12 +41,20 @@ public class Solver {
         return map[p.y][p.x];
     }
     public char getChar(int x, int y){
-        System.out.println(x);
-        System.out.println(y);
+//        System.out.println(x);
+//        System.out.println(y);
         return map[y][x];
     }
 
-    public Node bestFirst() {
+    public Point getEnd() {
+        return end;
+    }
+
+    public int getnExplored() {
+        return nExplored;
+    }
+
+    public Node bestFirst(Heuristic heuristic) {
         Node crt = new Node(getChar(ini),ini);
         ArrayList<Node> pendents = new ArrayList<>();
         ArrayList<Point> tratado = new ArrayList<>();
@@ -54,29 +64,36 @@ public class Solver {
             crt = pendents.get(0);
             tratado.add(crt.getCoord());
             nExplored++;
-            if (crt.getCoord() == end) {
+            if (crt.getCoord().equals(end)) {
                 return crt;
             }
-            lookArround(crt).forEach(node -> {
-                if ((!tratado.contains(node.getCoord()))){
-                    pendents.forEach(node1 -> {
-                        if (node1.getCoord() != node.getCoord()){
-                            pendents.add(node);
-                        } else {
-                            if ((node.compareTo(node1)) < 0){
-                                pendents.add(node);
-                            } else {
-                                pendents.add(node1);
-                            }
-                        }
-                    });
+            System.out.printf(crt.getCoord().toString());
+
+
+            for (Node node : lookAround(crt, heuristic)) {
+                int idx=0;
+                if (tratado.contains(node.getCoord())) continue;
+                boolean equals = false;
+                for (int i=0; i<pendents.size(); i++){
+                    if (pendents.get(i).getCoord() == node.getCoord()) {
+                        equals = true;
+                        idx= i;
+                    }
                 }
-            });
+                System.out.println(equals);
+                if (equals) {
+                    if (pendents.get(idx).getHeuristic() > node.getHeuristic()){
+                        pendents.remove(idx);
+                        pendents.add(node);
+                    }
+                } else pendents.add(node);
+            }
+            pendents.remove(crt);
         }
         return null; // Si no hay solucion
     }
 
-    public ArrayList<Node> lookArround(Node crt){
+    public ArrayList<Node> lookAround(Node crt, Heuristic heuristic){
         int x = crt.getCoord().x;
         int y = crt.getCoord().y;
         ArrayList<Node> around = new ArrayList<>();
@@ -85,33 +102,30 @@ public class Solver {
         if (((y+1) < maxY)&&('$'!=getChar(x, y+1))) {
             Node down = new Node(getChar(x, y+1),new Point(x, y+1), crt.getPath());
             down.getPath().add(crt);
+            down.setHeuristic(heuristic.calculate(down, end));
             around.add(down);
         }
         // Right
         if (((x+1) < maxX)&&('$'!=getChar(x+1, y))){
             Node right = new Node(getChar(x+1, y),new Point(x+1, y), crt.getPath());
             right.getPath().add(crt);
+            right.setHeuristic(heuristic.calculate(right, end));
             around.add(right);
         }
         // Left
         if (((x-1) >= 0)&&('$'!=getChar(x-1, y))) {
             Node left = new Node(getChar(x-1, y),new Point(x-1, y), crt.getPath());
             left.getPath().add(crt);
+            left.setHeuristic(heuristic.calculate(left, end));
             around.add(left);
         }
         // Up
         if (((y-1) >= 0)&&('$'!=getChar(x, y-1))){
             Node up = new Node(getChar(x, y-1),new Point(x, y-1), crt.getPath());
             up.getPath().add(crt);
+            up.setHeuristic(heuristic.calculate(up, end));
             around.add(up);
         }
         return around;
-    }
-
-    public int heruristicCoord(Node node) {
-        int x = node.getCoord().x - end.x;
-        int y = node.getCoord().y - end.y;
-        int heuristic = x+y;
-        return heuristic;
     }
 }

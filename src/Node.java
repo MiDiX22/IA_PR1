@@ -31,9 +31,26 @@ public class Node implements Comparable<Node> {
         return path;
     }
 
+    public int getHeuristic() {
+        return heuristic;
+    }
+
+    public void setHeuristic(int heuristic) {
+        this.heuristic = heuristic;
+    }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "name=" + name +
+                ", coord=" + coord +
+                ", heuristic=" + heuristic +
+                "}\n";
+    }
+
+
     @Override
     public int compareTo(Node o) {
-        Integer.compare(this.heuristic, o.heuristic);
-        return 0;
+        return Integer.compare(this.heuristic, o.heuristic);
     }
 }
