@@ -11,6 +11,7 @@ public class Solver {
     private Point ini;
     private Point end;
     private int maxX, maxY;
+    private Character endName;
 
     // Upload Map
     public Solver(File mapRaw, int maxX, int maxY, int iniX, int iniY, int endX, int endY) {
@@ -32,6 +33,7 @@ public class Solver {
                 }
                 i++;
             }
+        this.endName = this.getChar(endX, endY);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -80,7 +82,7 @@ public class Solver {
                         idx= i;
                     }
                 }
-                System.out.println(equals);
+//                System.out.println(equals);
                 if (equals) {
                     if (pendents.get(idx).getHeuristic() > node.getHeuristic()){
                         pendents.remove(idx);
@@ -102,28 +104,33 @@ public class Solver {
         if (((y+1) < maxY)&&('$'!=getChar(x, y+1))) {
             Node down = new Node(getChar(x, y+1),new Point(x, y+1), crt.getPath());
             down.getPath().add(crt);
-            down.setHeuristic(heuristic.calculate(down, end));
+            down.setHeuristic(heuristic.calculate(down, end, endName));
+            System.out.println(down.getHeuristic());
+
             around.add(down);
         }
         // Right
         if (((x+1) < maxX)&&('$'!=getChar(x+1, y))){
             Node right = new Node(getChar(x+1, y),new Point(x+1, y), crt.getPath());
             right.getPath().add(crt);
-            right.setHeuristic(heuristic.calculate(right, end));
+            right.setHeuristic(heuristic.calculate(right, end, endName));
+            System.out.println(right.getHeuristic());
             around.add(right);
         }
         // Left
         if (((x-1) >= 0)&&('$'!=getChar(x-1, y))) {
             Node left = new Node(getChar(x-1, y),new Point(x-1, y), crt.getPath());
             left.getPath().add(crt);
-            left.setHeuristic(heuristic.calculate(left, end));
+            left.setHeuristic(heuristic.calculate(left, end, endName));
+            System.out.println(left.getHeuristic());
             around.add(left);
         }
         // Up
         if (((y-1) >= 0)&&('$'!=getChar(x, y-1))){
             Node up = new Node(getChar(x, y-1),new Point(x, y-1), crt.getPath());
             up.getPath().add(crt);
-            up.setHeuristic(heuristic.calculate(up, end));
+            up.setHeuristic(heuristic.calculate(up, end, endName));
+            System.out.println(up.getHeuristic());
             around.add(up);
         }
         return around;
