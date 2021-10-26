@@ -43,8 +43,6 @@ public class Solver {
         return map[p.y][p.x];
     }
     public char getChar(int x, int y){
-//        System.out.println(x);
-//        System.out.println(y);
         return map[y][x];
     }
 
@@ -64,13 +62,12 @@ public class Solver {
         while ((pendents.size() > 0)){
             Collections.sort(pendents);
             crt = pendents.get(0);
+            System.out.println(crt);
             tratado.add(crt.getCoord());
             nExplored++;
             if (crt.getCoord().equals(end)) {
                 return crt;
             }
-            System.out.printf(crt.getCoord().toString());
-
 
             for (Node node : lookAround(crt, heuristic)) {
                 int idx=0;
@@ -82,13 +79,53 @@ public class Solver {
                         idx= i;
                     }
                 }
-//                System.out.println(equals);
                 if (equals) {
                     if (pendents.get(idx).getHeuristic() > node.getHeuristic()){
                         pendents.remove(idx);
                         pendents.add(node);
                     }
                 } else pendents.add(node);
+            }
+            pendents.remove(crt);
+        }
+        return null; // Si no hay solucion
+    }
+
+    public Node aStar(Heuristic heuristic) {
+        Node crt = new Node(getChar(ini),ini);
+        ArrayList<Node> pendents = new ArrayList<>();
+        ArrayList<Point> explored = new ArrayList<>();
+        ArrayList<Node> killed = new ArrayList<>();
+        pendents.add(crt);
+        while ((pendents.size() > 0)){
+            Collections.sort(pendents);
+            crt = pendents.get(0);
+            System.out.println(crt);
+            explored.add(crt.getCoord());
+            nExplored++;
+            if (crt.getCoord().equals(end)) {
+                return crt;
+            }
+            ArrayList<Node> tmp = lookAround(crt, heuristic);
+            int count = 0;
+            for (int i = 0; i<tmp.size(); i++){
+                Node node = tmp.get(i);
+                if (crt.getPath().contains(node)){
+                    continue;
+                }
+                if (killed.contains(node)) {
+                    continue;
+                }
+                if (explored.contains(node)) {
+                    count++;
+                    continue;
+                }
+                node.setHeuristic(node.getHeuristic()+node.pathTime());
+                pendents.add(node);
+
+            }
+            if (count == tmp.size()){
+                killed.add(crt);
             }
             pendents.remove(crt);
         }
@@ -105,8 +142,6 @@ public class Solver {
             Node down = new Node(getChar(x, y+1),new Point(x, y+1), crt.getPath());
             down.getPath().add(crt);
             down.setHeuristic(heuristic.calculate(down, end, endName));
-            System.out.println(down.getHeuristic());
-
             around.add(down);
         }
         // Right
@@ -114,7 +149,6 @@ public class Solver {
             Node right = new Node(getChar(x+1, y),new Point(x+1, y), crt.getPath());
             right.getPath().add(crt);
             right.setHeuristic(heuristic.calculate(right, end, endName));
-            System.out.println(right.getHeuristic());
             around.add(right);
         }
         // Left
@@ -122,7 +156,6 @@ public class Solver {
             Node left = new Node(getChar(x-1, y),new Point(x-1, y), crt.getPath());
             left.getPath().add(crt);
             left.setHeuristic(heuristic.calculate(left, end, endName));
-            System.out.println(left.getHeuristic());
             around.add(left);
         }
         // Up
@@ -130,7 +163,6 @@ public class Solver {
             Node up = new Node(getChar(x, y-1),new Point(x, y-1), crt.getPath());
             up.getPath().add(crt);
             up.setHeuristic(heuristic.calculate(up, end, endName));
-            System.out.println(up.getHeuristic());
             around.add(up);
         }
         return around;
