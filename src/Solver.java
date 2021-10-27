@@ -54,6 +54,10 @@ public class Solver {
         return nExplored;
     }
 
+    public void setnExplored(int nExplored) {
+        this.nExplored = nExplored;
+    }
+
     public Node bestFirst(Heuristic heuristic) {
         Node crt = new Node(getChar(ini),ini);
         ArrayList<Node> pendents = new ArrayList<>();
@@ -62,7 +66,6 @@ public class Solver {
         while ((pendents.size() > 0)){
             Collections.sort(pendents);
             crt = pendents.get(0);
-            System.out.println(crt);
             tratado.add(crt.getCoord());
             nExplored++;
             if (crt.getCoord().equals(end)) {
@@ -100,7 +103,6 @@ public class Solver {
         while ((pendents.size() > 0)){
             Collections.sort(pendents);
             crt = pendents.get(0);
-            System.out.println(crt);
             explored.add(crt.getCoord());
             nExplored++;
             if (crt.getCoord().equals(end)) {
